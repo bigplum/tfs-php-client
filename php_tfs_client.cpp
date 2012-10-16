@@ -111,9 +111,11 @@ PHP_MINFO_FUNCTION(tfs_client)
 PHP_FUNCTION(tfs_client)
 {
     char* ns_ip  = NULL;
+    char* level = NULL;
     long ns_ip_length = 0;
-    int32_t ret = zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s",
-            &ns_ip, &ns_ip_length);
+    long level_length = 0;
+    int32_t ret = zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss",
+            &ns_ip, &ns_ip_length, &level, &level_length);
     if (FAILURE == ret)
     {
         php_error(E_WARNING, "tfs_client: can't parse parameters");
@@ -133,6 +135,14 @@ PHP_FUNCTION(tfs_client)
         if (TFS_SUCCESS != ret)
         {
             php_error(E_WARNING, "tfs_client: initialize failed, ret: %d", ret);
+        }
+        if (level && strcmp(level,"INFO") && strcmp(level, "DEBUG")
+                 && strcmp(level,"ERROR"))
+        {
+            php_error(E_WARNING, "tfs_client: parameters is invalid");
+        } else 
+        {
+	    gclient->set_log_level(level);
         }
         ret = ret == TFS_SUCCESS ? SUCCESS : FAILURE;
     }

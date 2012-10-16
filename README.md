@@ -9,12 +9,22 @@ So I wrote the new php client by wraping the c++ API:[TfsClient](http://code.tao
 
 Install
 -----------------
-1. copy the *.cpp and *.h to tfs/src/phpclient
-2. modify the phpize and php-config path in the tfs/src/phpclient/build.sh
-3. run build.sh and make
-4. copy modules/tfs_client.so to php lib directory and modify php.ini to add
+0. tbsys/tbnet must be prepared
+1. copy *.cpp and *.h to tfs/src/phpclient
+2. copy tfs/src/common to tfs/src/phpclient/common
+3. modify the phpize and php-config path in the tfs/src/phpclient/build.sh
+4. run build.sh and make
+5. if error, create libtairclientapi.a and make again
+
+    cd .libs
+    ar -r php_tfs_client.a php_tfs_client.o
+    cp -a ./php_tfs_client.a /lib/libtairclientapi.a
+
+6. copy modules/tfs_client.so to php lib directory and modify php.ini to add
    the module
-5. excute run.sh to test the client
+7. excute run.sh to test the client
+
+or download the precompiled tfs_client.so from modules directory directly.
 
 Usage
 ----------------
@@ -36,7 +46,7 @@ There are only 4 functions now....
     *} OpenFlag;
     */
 
-    $tfsobj = new tfs_client("localhost:8108");
+    $tfsobj = new tfs_client("localhost:8108", "INFO"); //log level: DEBUG/INFO/ERROR
     echo "\n-------------------\n";
     $data='XXXXXXXXXXXX';
     $data_len = strlen($data);
