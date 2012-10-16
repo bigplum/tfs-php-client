@@ -1,4 +1,4 @@
-PHP Client for TFS(taobao filesystem) without rcserver supporting
+PHP Client for [TFS(Taobao File System)](http://code.taobao.org/p/tfs/src/) without rcserver supporting
 -----------------
 
 The original php-tfs-client need rcserver/meta_server, but they are diffcult to
