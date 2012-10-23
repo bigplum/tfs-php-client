@@ -24,23 +24,24 @@ static TfsClient* gclient;
  *
  * Every user visible function must have an entry in tfs_client_functions[].
  */
-function_entry tfs_client_functions[] = {
-    PHP_FE(confirm_tfs_client_compiled,	NULL)		/* For testing, remove later. */
-    {NULL, NULL, NULL}	/* Must be the last line in tfs_client_functions[] */
-};
+    function_entry tfs_client_functions[] = {
+        PHP_FE(confirm_tfs_client_compiled,	NULL)		/* For testing, remove later. */
+        {NULL, NULL, NULL}	/* Must be the last line in tfs_client_functions[] */
+    };
 /* }}} */
 
-static zend_function_entry tfs_client_class_functions[] = {
-    PHP_FE(tfs_client, NULL)
-        PHP_FALIAS(write, tfs_client_write, NULL)
-        PHP_FALIAS(open, tfs_client_open, NULL)
-        PHP_FALIAS(close, tfs_client_close, NULL)
-        PHP_FALIAS(read, tfs_client_read, NULL)
-        {NULL, NULL, NULL}
-};
+    static zend_function_entry tfs_client_class_functions[] = {
+            PHP_FE(tfs_client, NULL)
+            PHP_FALIAS(write, tfs_client_write, NULL)
+            PHP_FALIAS(open, tfs_client_open, NULL)
+            PHP_FALIAS(close, tfs_client_close, NULL)
+            PHP_FALIAS(read, tfs_client_read, NULL)
+            PHP_FALIAS(stat, tfs_client_stat, NULL)
+            {NULL, NULL, NULL}
+    };
 
 /* {{{ tfs_client_module_entry
- */
+*/
 zend_module_entry tfs_client_module_entry = {
 #if ZEND_MODULE_API_NO >= 20010901
     STANDARD_MODULE_HEADER,
@@ -69,7 +70,7 @@ extern "C"
 /* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION
- */
+*/
 PHP_MINIT_FUNCTION(tfs_client)
 {
     /*** Defines TFS Class ***/
@@ -81,7 +82,7 @@ PHP_MINIT_FUNCTION(tfs_client)
 /* }}} */
 
 /* {{{ PHP_MSHUTDOWN_FUNCTION
- */
+*/
 PHP_MSHUTDOWN_FUNCTION(tfs_client)
 {
     if (NULL != gclient)
@@ -94,7 +95,7 @@ PHP_MSHUTDOWN_FUNCTION(tfs_client)
 
 
 /* {{{ PHP_MINFO_FUNCTION
- */
+*/
 PHP_MINFO_FUNCTION(tfs_client)
 {
     php_info_print_table_start();
@@ -137,12 +138,12 @@ PHP_FUNCTION(tfs_client)
             php_error(E_WARNING, "tfs_client: initialize failed, ret: %d", ret);
         }
         if (level && strcmp(level,"INFO") && strcmp(level, "DEBUG")
-                 && strcmp(level,"ERROR"))
+                && strcmp(level,"ERROR"))
         {
             php_error(E_WARNING, "tfs_client: parameters is invalid");
         } else 
         {
-	    gclient->set_log_level(level);
+            gclient->set_log_level(level);
         }
         ret = ret == TFS_SUCCESS ? SUCCESS : FAILURE;
     }
@@ -319,6 +320,50 @@ PHP_FUNCTION(tfs_client_read)
 }
 /* }}} */
 
+/* {{{ Array $tfs_client->stat(const int fd)
+ * Does a tfs_client get tfsfile stat
+ */
+PHP_FUNCTION(tfs_client_stat)
+{
+    long fd = -1;
+    array_init(return_value);
+    int32_t ret = zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l",
+            &fd);
+    if (FAILURE == ret)
+    {
+        php_error(E_WARNING, "tfs_client: can't parse parameters");
+    }
+    if (SUCCESS == ret)
+    {
+        ret = fd <= 0 ?  FAILURE : SUCCESS;
+        if (SUCCESS != ret)
+        {
+            php_error(E_WARNING, "tfs_client: parameters is invalid");
+        }
+    }
+
+    TfsFileStat finfo;
+    if (SUCCESS == ret)
+    {
+        ret = gclient->fstat(fd, &finfo);
+        if (TFS_SUCCESS != ret)
+        {
+            php_error(E_ERROR, "tfs_client: stat failed, fd: %ld, ret: %d", fd,   ret);
+        }
+        ret = ret == TFS_SUCCESS ? SUCCESS  : FAILURE;
+    }
+    if (SUCCESS == ret)
+    {
+        add_next_index_long(return_value, finfo.size_);
+        add_next_index_long(return_value, finfo.modify_time_);
+        add_next_index_long(return_value, finfo.create_time_);
+        add_next_index_long(return_value, finfo.crc_);
+    }
+    if (SUCCESS != ret)
+        RETURN_FALSE;
+}
+/* }}} */
+
 
 /* Remove the following function when you have succesfully modified config.m4
    so that your module can be compiled into PHP, it exists only for testing
@@ -345,4 +390,4 @@ PHP_FUNCTION(confirm_tfs_client_compiled)
    unfold functions in source code. See the corresponding marks just before
    function definition, where the functions purpose is also documented. Please
    follow this convention for the convenience of others editing your code.
- */
+   */
