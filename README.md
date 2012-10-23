@@ -60,6 +60,20 @@ There are only 4 functions now....
     
     echo "\n------------read data case------------\n";
     $fd=$tfsobj->open($filename[1], "",1);
+
+    echo "\n------------stat file case------------\n";
+    $stat = $tfsobj->stat($fd);
+    var_dump($stat);
+    /*
+    array stat(
+        int size;
+        int modify_time;
+        int create_time;
+        int crc;
+    )
+    */
+
+    echo "\n------------read data case------------\n";
     $ary=$tfsobj->read($fd, 20);
     echo "\n=============read data: length: $ary[0], data: $ary[1]\n";
     $tfsobj->close($fd);
