@@ -31,12 +31,13 @@ static TfsClient* gclient;
 /* }}} */
 
     static zend_function_entry tfs_client_class_functions[] = {
-            PHP_FE(tfs_client, NULL)
+        PHP_FE(tfs_client, NULL)
             PHP_FALIAS(write, tfs_client_write, NULL)
             PHP_FALIAS(open, tfs_client_open, NULL)
             PHP_FALIAS(close, tfs_client_close, NULL)
             PHP_FALIAS(read, tfs_client_read, NULL)
             PHP_FALIAS(stat, tfs_client_stat, NULL)
+            PHP_FALIAS(unlink, tfs_client_unlink, NULL)
             {NULL, NULL, NULL}
     };
 
@@ -361,6 +362,45 @@ PHP_FUNCTION(tfs_client_stat)
     }
     if (SUCCESS != ret)
         RETURN_FALSE;
+}
+/* }}} */
+
+
+/* {{{ bool $tfs_client->unlink(const char* filename, const char* suffix, const int action)
+ *
+ * Does a tfs_client remove file via tfsfile
+ */
+PHP_FUNCTION(tfs_client_unlink)
+{
+    int64_t fs;
+    char* filename = NULL;
+    char* suffix   = NULL;
+    long file_name_length = 0;
+    long suffix_length = 0;
+    int32_t ret = zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss!", &filename, &file_name_length, &suffix, &suffix_length);
+
+    if (FAILURE == ret) {
+        php_error(E_WARNING, "tfs_client: can't parse parameters"); 
+    }
+    if (SUCCESS == ret) {
+        ret = NULL == filename;
+        if (SUCCESS != ret)
+        {
+            php_error(E_WARNING, "tfs_client: parameters is invalid");
+        }
+    }
+
+    if (SUCCESS == ret)
+    {
+        ret = gclient->unlink(fs, filename, suffix, DELETE, TFS_FILE_DEFAULT_OPTION);
+
+        if (TFS_SUCCESS != ret)
+        {
+            php_error(E_WARNING, "tfs_client: remove file %s, ret: %d",
+                     filename, ret);
+        }
+    }
+    RETURN_LONG(ret);
 }
 /* }}} */
 

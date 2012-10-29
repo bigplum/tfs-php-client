@@ -24,6 +24,7 @@ PHP_FUNCTION(tfs_client_close);
 PHP_FUNCTION(tfs_client_write);
 PHP_FUNCTION(tfs_client_read);
 PHP_FUNCTION(tfs_client_stat);
+PHP_FUNCTION(tfs_client_unlink);
 PHP_FUNCTION(confirm_tfs_client_compiled);      /* For testing, remove later. */
 
 

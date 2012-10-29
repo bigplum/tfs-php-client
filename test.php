@@ -18,7 +18,7 @@
 *  T_FORCE = 256
 *} OpenFlag;
 */
-$tfsobj = new tfs_client($argv[1]);
+$tfsobj = new tfs_client($argv[1], "INFO");
 echo "\n-------------------\n";
 $data='XXXXXXXXXXXX';
 $data_len = strlen($data);
@@ -34,8 +34,17 @@ echo "\n------------read data case------------\n";
 $fd=$tfsobj->open($filename[1], "",1);
 $ary=$tfsobj->read($fd, 20);
 echo "\n=============read data: length: $ary[0], data: $ary[1]\n";
-$tfsobj->close($fd);
 
+$st=$tfsobj->stat($fd);
+echo "\nstat: $st[0], $st[1], $st[2], $st[3] \n";
+
+$ret = $tfsobj->unlink($filename[1], "");
+echo "\n=============unlink: $ret\n";
+
+$st=$tfsobj->stat($fd);
+echo "\nunlink stat: $st[0], $st[1], $st[2], $st[3]\n";
+
+$tfsobj->close($fd);
 exit(0);
 
   echo "\n------------stat case------------\n";
