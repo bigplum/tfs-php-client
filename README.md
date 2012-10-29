@@ -76,5 +76,12 @@ There are only 4 functions now....
     echo "\n------------read data case------------\n";
     $ary=$tfsobj->read($fd, 20);
     echo "\n=============read data: length: $ary[0], data: $ary[1]\n";
+
+    $ret = $tfsobj->unlink($filename[1], "");
+    echo "\n=============unlink: $ret\n";
+
+    $st=$tfsobj->stat($fd);
+    echo "\nunlink stat: $st[0], $st[1], $st[2], $st[3]\n";
+
     $tfsobj->close($fd);
     
