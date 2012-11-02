@@ -16,9 +16,9 @@ Install
 4. run build.sh and make
 5. if error, create libtairclientapi.a and make again
 
-    cd .libs
-    ar -r php_tfs_client.a php_tfs_client.o
-    cp -a ./php_tfs_client.a /lib/libtairclientapi.a
+    cd .libs;
+    ar -r php_tfs_client.a php_tfs_client.o;
+    cp -a ./php_tfs_client.a /lib/libtairclientapi.a;
 
 6. copy modules/tfs_client.so to php lib directory and modify php.ini to add
    the module
